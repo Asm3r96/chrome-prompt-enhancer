@@ -19,13 +19,19 @@
   if (!selector) return;
 
   // Inject observer that waits for the textarea to exist
-  const observer = new MutationObserver(() => {
+  function tryInject() {
     const field = document.querySelector(selector);
     if (field && !field.dataset.enhancerApplied) {
       injectButton(field);
       field.dataset.enhancerApplied = 'true';
     }
-  });
+  }
+
+  // Inject immediately in case the textarea already exists
+  tryInject();
+
+  // Observe for future additions as some pages replace the entire body
+  const observer = new MutationObserver(tryInject);
   observer.observe(document.documentElement, { childList: true, subtree: true });
 
   function injectButton(textarea) {
