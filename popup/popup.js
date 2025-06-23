@@ -17,13 +17,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!currentTab) {
       [currentTab] = await chrome.tabs.query({ active: true, currentWindow: true });
     }
-    chrome.tabs.sendMessage(currentTab.id, { type: 'GET_PROMPT' }, res => {
-      if (res && typeof res.prompt === 'string') {
-        promptArea.value = res.prompt;
-      } else {
-        status.textContent = 'Unable to read prompt';
-      }
-    });
+
+    function requestPrompt() {
+      chrome.tabs.sendMessage(currentTab.id, { type: 'GET_PROMPT' }, res => {
+        if (chrome.runtime.lastError) {
+          chrome.scripting.executeScript({ target: { tabId: currentTab.id }, files: ['content.js'] }, () => {
+            if (chrome.runtime.lastError) {
+              status.textContent = 'Unable to connect to ChatGPT';
+            } else {
+              chrome.tabs.sendMessage(currentTab.id, { type: 'GET_PROMPT' }, inner => {
+                if (inner && typeof inner.prompt === 'string') {
+                  promptArea.value = inner.prompt;
+                } else {
+                  status.textContent = 'Unable to read prompt';
+                }
+              });
+            }
+          });
+        } else if (res && typeof res.prompt === 'string') {
+          promptArea.value = res.prompt;
+        } else {
+          status.textContent = 'Unable to read prompt';
+        }
+      });
+    }
+
+    requestPrompt();
   }
 
   await fetchPrompt();
