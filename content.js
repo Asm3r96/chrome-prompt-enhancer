@@ -1,11 +1,16 @@
 /* global chrome */
+
+function getCurrentPrompt() {
+  const field = document.querySelector(
+    '#prompt-textarea, div[role="textbox"], textarea[data-testid="prompt-textarea"]'
+  );
+  return field ? (field.value !== undefined ? field.value : field.innerText) : '';
+}
+
 // Respond to popup requests for getting or setting the ChatGPT prompt
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'GET_PROMPT') {
-    const field = document.querySelector(
-      '#prompt-textarea, div[role="textbox"], textarea[data-testid="prompt-textarea"]'
-    );
-    const value = field ? (field.value !== undefined ? field.value : field.innerText) : '';
+    const value = getCurrentPrompt();
     sendResponse({ prompt: value.trim() });
   } else if (msg.type === 'SET_PROMPT') {
     const field = document.querySelector(
@@ -36,11 +41,11 @@ async function openOverlay() {
   overlay.style.cssText = 'position:fixed;top:10%;left:50%;transform:translateX(-50%);z-index:10000;background:white;border:1px solid #ccc;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,0.2);';
   overlay.innerHTML = `
     <textarea id="pe-prompt" rows="4" style="width:100%;"></textarea>
-    <button id="pe-refresh">Refresh</button>
-    <button id="pe-enhance">Enhance with Gemini</button>
+    <button id="pe-refresh" style="background:#eee;">Refresh</button>
+    <button id="pe-enhance" style="background:#eee;">Enhance with Gemini</button>
     <textarea id="pe-improved" rows="4" style="width:100%;display:none;"></textarea>
-    <button id="pe-accept" style="display:none;">Accept</button>
-    <button id="pe-close">Close</button>
+    <button id="pe-accept" style="display:none;background:#eee;">Accept</button>
+    <button id="pe-close" style="background:#eee;">Close</button>
     <div id="pe-status" style="font-size:12px;color:green;margin-top:4px;"></div>`;
   document.body.appendChild(overlay);
 
@@ -53,11 +58,8 @@ async function openOverlay() {
   const status = overlay.querySelector('#pe-status');
 
   function fetchPrompt() {
-    chrome.runtime.sendMessage({ type: 'GET_PROMPT' }, res => {
-      if (res && typeof res.prompt === 'string') {
-        promptArea.value = res.prompt;
-      }
-    });
+    const text = getCurrentPrompt();
+    promptArea.value = text.trim();
   }
 
   fetchPrompt();
