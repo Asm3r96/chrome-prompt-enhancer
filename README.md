@@ -9,6 +9,7 @@
 ### 3. Use it
 * Open ChatGPT and type your prompt.
 * Click the extension icon to open the popup. The current prompt is loaded automatically.
+* If needed, press **Refresh** to re-read the latest prompt from ChatGPT.
 * Press **Enhance with Gemini** to get an improved version using Gemini 2.5 Flash.
 * Click **Accept** to replace the text in ChatGPT.
 
