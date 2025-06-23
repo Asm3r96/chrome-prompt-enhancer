@@ -14,6 +14,8 @@
 ### 4. Troubleshooting
 * If you get “API key not set” check the popup.
 * Open *chrome://extensions* → *Service Worker* → *Inspect* to view background logs.
+* If the ✨ Enhance button does not appear, reload the page and ensure the
+  extension is enabled in the popup.
 
 ### 5. Security note
 Your key is stored locally using `chrome.storage.sync` and is only sent directly to the chosen provider over HTTPS.

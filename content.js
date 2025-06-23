@@ -5,9 +5,14 @@
 
   // Map of hostname => selector for textarea / input
   const TARGETS = {
-    'chat.openai.com': 'form textarea, form [data-id="root"] textarea',
-    'claude.ai': 'textarea[data-testid="conversation-textarea"]',
-    'gemini.google.com': 'textarea[aria-label*="Send a message"]'
+    // ChatGPT frequently changes its markup. Try a few common selectors
+    'chat.openai.com': 'textarea[data-testid="prompt-textarea"], form textarea',
+
+    // Claude uses a dedicated textarea for conversations
+    'claude.ai': 'textarea[data-testid="conversation-textarea"], textarea[placeholder*="Claude"]',
+
+    // Gemini exposes a textarea labelled with "message"
+    'gemini.google.com': 'textarea[aria-label*="message"]'
   };
 
   const selector = TARGETS[location.hostname];
@@ -21,7 +26,7 @@
       field.dataset.enhancerApplied = 'true';
     }
   });
-  observer.observe(document.body, { childList: true, subtree: true });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
 
   function injectButton(textarea) {
     const btn = document.createElement('button');
@@ -36,7 +41,8 @@
         if (response?.ok) {
           textarea.value = response.improved;
         } else {
-          alert(`Enhancer error: ${response?.error || 'unknown'}`);
+          const err = response?.error || chrome.runtime.lastError?.message || 'unknown';
+          alert(`Enhancer error: ${err}`);
         }
         btn.textContent = '✨ Enhance';
         btn.disabled = false;
