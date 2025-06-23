@@ -4,18 +4,17 @@
 3. The wrench‑icon should appear in the toolbar.
 
 ### 2. Configure
-* Click the icon → enter your API key and pick the model.
-* Toggle the *Extension enabled* checkbox to temporarily disable injection without uninstalling.
+* Click the icon and enter your Gemini API key.
 
 ### 3. Use it
-* Open ChatGPT, Claude or Gemini.
-* Type a prompt → click **✨ Enhance** → the textarea is instantly replaced with an improved version. Edit further or hit *Send*.
+* Open ChatGPT and type your prompt.
+* Click the extension icon to open the popup. The current prompt is loaded automatically.
+* Press **Enhance with Gemini** to get an improved version using Gemini 2.5 Flash.
+* Click **Accept** to replace the text in ChatGPT.
 
 ### 4. Troubleshooting
-* If you get “API key not set” check the popup.
-* Open *chrome://extensions* → *Service Worker* → *Inspect* to view background logs.
-* If the ✨ Enhance button does not appear, reload the page and ensure the
-  extension is enabled in the popup.
+* If you get “API key required” check the popup.
+* Reload the ChatGPT page if the prompt is not detected.
 
 ### 5. Security note
 Your key is stored locally using `chrome.storage.sync` and is only sent directly to the chosen provider over HTTPS.
