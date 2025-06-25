@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (!apiKey.startsWith('AIza')) {
       showStatus('warning', 'Check API Key', 'Make sure you\'re using a valid Gemini API key');
     } else {
-      showStatus('success', 'API Key Configured', 'Press Alt+P on ChatGPT to start enhancing prompts');
+      showStatus('success', 'API Key Configured', 'Press Alt+A on ChatGPT, Claude, or Gemini to start enhancing prompts');
     }
   }
 

@@ -1,6 +1,6 @@
 {
-  "name": "Gemini Prompt Enhancer",
-  "description": "Use Gemini 2.5 Flash to refine prompts in ChatGPT.",
+  "name": "Gemini Prompt Enhancer",
+  "description": "Use Gemini 2.5 Flash to refine prompts in ChatGPT, Claude.ai, and Gemini.",
   "version": "0.2.0",
   "manifest_version": 3,
   "background": {
@@ -14,7 +14,9 @@
     {
       "matches": [
         "https://chat.openai.com/*",
-        "https://chatgpt.com/*"
+        "https://chatgpt.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_idle"
@@ -22,12 +24,12 @@
   ],
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "Prompt Enhancer"
+    "default_title": "Prompt Enhancer"
   },
   "commands": {
     "open_prompt_overlay": {
       "suggested_key": { "default": "Alt+A" },
-      "description": "Open overlay"
+      "description": "Open prompt enhancer overlay"
     }
   },
   "web_accessible_resources": [

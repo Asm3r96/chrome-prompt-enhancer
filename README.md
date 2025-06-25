@@ -8,13 +8,23 @@
 * Enter your Gemini API key and click **Save**.
 
 ### 3. Use it
-* Open ChatGPT and type your prompt.
-* Press **Alt+P** (or your chosen shortcut) to open the overlay on the page.
+* Open **ChatGPT**, **Claude.ai**, or **Gemini** and type your prompt.
+* Press **Alt+A** (or your chosen shortcut) to open the overlay on the page.
 * Click **Enhance with Gemini** and then **Accept** to replace the prompt.
 
-### 4. Troubleshooting
-* If you get “API key required” check the popup.
-* Reload the ChatGPT page if the prompt is not detected.
+### 4. Supported Platforms
+✅ **ChatGPT** (chat.openai.com, chatgpt.com)  
+✅ **Claude.ai** (claude.ai)  
+✅ **Gemini** (gemini.google.com)  
 
-### 5. Security note
-Your key is stored locally using `chrome.storage.sync` and is only sent directly to the chosen provider over HTTPS.
+The extension automatically detects which platform you're using and adapts accordingly.
+
+### 5. Troubleshooting
+* If you get "API key required" check the popup settings.
+* If the prompt is not detected, try clicking **Refresh** in the overlay.
+* Reload the page if the extension doesn't work properly.
+* On Claude.ai, make sure you're typing in the main input area.
+* On Gemini, ensure you're typing in the main prompt box.
+
+### 6. Security note
+Your API key is stored locally using `chrome.storage.sync` and is only sent directly to Google's Gemini API over HTTPS. No data is shared with third parties.
