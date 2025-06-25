@@ -3,6 +3,9 @@
   "description": "Use Gemini 2.5 Flash to refine prompts in ChatGPT.",
   "version": "0.2.0",
   "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
   "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [
     "https://generativelanguage.googleapis.com/*"
@@ -20,6 +23,12 @@
   "action": {
     "default_popup": "popup/popup.html",
     "default_title": "Prompt Enhancer"
+  },
+  "commands": {
+    "open_prompt_overlay": {
+      "suggested_key": { "default": "Alt+P" },
+      "description": "Open overlay"
+    }
   },
   "icons": {
     "16": "icons/icon16.png",
