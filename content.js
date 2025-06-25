@@ -1,134 +1,238 @@
 /* global chrome */
 
+// Detect which platform we're on
+function detectPlatform() {
+  const hostname = window.location.hostname;
+  if (hostname.includes('claude.ai')) return 'claude';
+  if (hostname.includes('chat.openai.com') || hostname.includes('chatgpt.com')) return 'chatgpt';
+  if (hostname.includes('gemini.google.com')) return 'gemini';
+  return 'unknown';
+}
+
 function getCurrentPrompt() {
-  const field = document.querySelector(
-    '#prompt-textarea, div[role="textbox"], textarea[data-testid="prompt-textarea"]'
-  );
-  return field ? (field.value !== undefined ? field.value : field.innerText) : '';
+  const platform = detectPlatform();
+  
+  if (platform === 'chatgpt') {
+    const selectors = [
+      '#prompt-textarea',
+      'div[role="textbox"]',
+      'textarea[data-testid="prompt-textarea"]',
+      'textarea[placeholder*="message"]'
+    ];
+    
+    for (const selector of selectors) {
+      const field = document.querySelector(selector);
+      if (field) {
+        if (field.value !== undefined) {
+          return field.value;
+        } else if (field.innerText !== undefined) {
+          return field.innerText;
+        } else if (field.textContent !== undefined) {
+          return field.textContent;
+        }
+      }
+    }
+  } else if (platform === 'claude') {
+    // Claude uses ProseMirror editor
+    const proseMirror = document.querySelector('.ProseMirror');
+    if (proseMirror) {
+      // Get text from the paragraph inside ProseMirror
+      const paragraph = proseMirror.querySelector('p');
+      if (paragraph) {
+        return paragraph.textContent || paragraph.innerText || '';
+      }
+      // Fallback to ProseMirror itself
+      return proseMirror.textContent || proseMirror.innerText || '';
+    }
+    
+    // Fallback selectors for Claude
+    const fallbackSelectors = [
+      'div[contenteditable="true"]',
+      'div[aria-label*="prompt"]',
+      'div[aria-label*="Claude"]'
+    ];
+    
+    for (const selector of fallbackSelectors) {
+      const field = document.querySelector(selector);
+      if (field) {
+        return field.textContent || field.innerText || '';
+      }
+    }
+  } else if (platform === 'gemini') {
+    // Gemini uses Quill editor
+    const quillEditor = document.querySelector('.ql-editor');
+    if (quillEditor) {
+      // Get text from the paragraph inside Quill editor
+      const paragraph = quillEditor.querySelector('p');
+      if (paragraph) {
+        return paragraph.textContent || paragraph.innerText || '';
+      }
+      // Fallback to Quill editor itself
+      return quillEditor.textContent || quillEditor.innerText || '';
+    }
+    
+    // Fallback selectors for Gemini
+    const fallbackSelectors = [
+      'div[aria-label*="Enter a prompt"]',
+      'div[data-placeholder*="Gemini"]',
+      'div[contenteditable="true"]'
+    ];
+    
+    for (const selector of fallbackSelectors) {
+      const field = document.querySelector(selector);
+      if (field) {
+        return field.textContent || field.innerText || '';
+      }
+    }
+  }
+  
+  return '';
 }
 
 function setCurrentPrompt(text) {
-  const field = document.querySelector(
-    '#prompt-textarea, div[role="textbox"], textarea[data-testid="prompt-textarea"]'
-  );
-  if (!field) return false;
-  if (field.value !== undefined) {
-    field.value = text;
-  } else {
-    field.innerText = text;
+  const platform = detectPlatform();
+  
+  if (platform === 'chatgpt') {
+    const selectors = [
+      '#prompt-textarea',
+      'div[role="textbox"]',
+      'textarea[data-testid="prompt-textarea"]',
+      'textarea[placeholder*="message"]'
+    ];
+    
+    for (const selector of selectors) {
+      const field = document.querySelector(selector);
+      if (field) {
+        try {
+          if (field.value !== undefined) {
+            field.value = text;
+          } else {
+            field.innerText = text;
+            field.textContent = text;
+          }
+          
+          // Trigger events for ChatGPT
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+          field.dispatchEvent(new Event('change', { bubbles: true }));
+          field.focus();
+          
+          return true;
+        } catch (error) {
+          console.log('Error setting prompt with selector:', selector, error);
+          continue;
+        }
+      }
+    }
+  } else if (platform === 'claude') {
+    // Claude uses ProseMirror editor
+    const proseMirror = document.querySelector('.ProseMirror');
+    if (proseMirror) {
+      try {
+        // Set the content as a paragraph (matching Claude's structure)
+        proseMirror.innerHTML = `<p>${text}</p>`;
+        
+        // Trigger events to notify Claude of the change
+        proseMirror.dispatchEvent(new Event('input', { bubbles: true }));
+        proseMirror.dispatchEvent(new Event('change', { bubbles: true }));
+        proseMirror.dispatchEvent(new Event('keyup', { bubbles: true }));
+        proseMirror.dispatchEvent(new Event('paste', { bubbles: true }));
+        
+        // Focus the editor
+        proseMirror.focus();
+        
+        // Move cursor to end
+        const range = document.createRange();
+        const selection = window.getSelection();
+        range.selectNodeContents(proseMirror);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        return true;
+      } catch (error) {
+        console.log('Error setting Claude prompt:', error);
+      }
+    }
+    
+    // Fallback for other contenteditable elements
+    const fallbackSelectors = [
+      'div[contenteditable="true"]',
+      'div[aria-label*="prompt"]',
+      'div[aria-label*="Claude"]'
+    ];
+    
+    for (const selector of fallbackSelectors) {
+      const field = document.querySelector(selector);
+      if (field) {
+        try {
+          field.innerHTML = `<p>${text}</p>`;
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+          field.focus();
+          return true;
+        } catch (error) {
+          console.log('Error with fallback selector:', selector, error);
+          continue;
+        }
+      }
+    }
+  } else if (platform === 'gemini') {
+    // Gemini uses Quill editor
+    const quillEditor = document.querySelector('.ql-editor');
+    if (quillEditor) {
+      try {
+        // Set the content as a paragraph (matching Gemini's structure)
+        quillEditor.innerHTML = `<p>${text}</p>`;
+        
+        // Trigger events to notify Gemini of the change
+        quillEditor.dispatchEvent(new Event('input', { bubbles: true }));
+        quillEditor.dispatchEvent(new Event('change', { bubbles: true }));
+        quillEditor.dispatchEvent(new Event('keyup', { bubbles: true }));
+        quillEditor.dispatchEvent(new Event('paste', { bubbles: true }));
+        
+        // Focus the editor
+        quillEditor.focus();
+        
+        // Move cursor to end
+        const range = document.createRange();
+        const selection = window.getSelection();
+        range.selectNodeContents(quillEditor);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        return true;
+      } catch (error) {
+        console.log('Error setting Gemini prompt:', error);
+      }
+    }
+    
+    // Fallback for other contenteditable elements
+    const fallbackSelectors = [
+      'div[aria-label*="Enter a prompt"]',
+      'div[data-placeholder*="Gemini"]',
+      'div[contenteditable="true"]'
+    ];
+    
+    for (const selector of fallbackSelectors) {
+      const field = document.querySelector(selector);
+      if (field) {
+        try {
+          field.innerHTML = `<p>${text}</p>`;
+          field.dispatchEvent(new Event('input', { bubbles: true }));
+          field.focus();
+          return true;
+        } catch (error) {
+          console.log('Error with Gemini fallback selector:', selector, error);
+          continue;
+        }
+      }
+    }
   }
-  field.dispatchEvent(new Event('input', { bubbles: true }));
-  return true;
+  
+  return false;
 }
 
-// Respond to popup requests for getting or setting the ChatGPT prompt
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.type === 'GET_PROMPT') {
-    const value = getCurrentPrompt();
-    sendResponse({ prompt: value.trim() });
-  } else if (msg.type === 'SET_PROMPT') {
-    const ok = setCurrentPrompt(msg.prompt);
-    if (ok) {
-      sendResponse({ ok: true });
-    } else {
-      sendResponse({ ok: false, error: 'Input field not found' });
-    }
-  } else if (msg.type === 'OPEN_OVERLAY') {
-    openOverlay();
-  }
-  return true;
-});
-
-async function openOverlay() {
-  if (document.getElementById('prompt-overlay')) return;
-
-  const overlay = document.createElement('div');
-  overlay.id = 'prompt-overlay';
-  overlay.style.cssText = 'position:fixed;top:10%;left:50%;transform:translateX(-50%);z-index:10000;background:white;border:1px solid #ccc;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,0.2);';
-  overlay.innerHTML = `
-    <textarea id="pe-prompt" rows="4" style="width:100%;"></textarea>
-    <button id="pe-refresh" style="background:#eee;">Refresh</button>
-    <button id="pe-enhance" style="background:#eee;">Enhance with Gemini</button>
-    <textarea id="pe-improved" rows="4" style="width:100%;display:none;"></textarea>
-    <button id="pe-accept" style="display:none;background:#eee;">Accept</button>
-    <button id="pe-close" style="background:#eee;">Close</button>
-    <div id="pe-status" style="font-size:12px;color:green;margin-top:4px;"></div>`;
-  document.body.appendChild(overlay);
-
-  const promptArea = overlay.querySelector('#pe-prompt');
-  const refreshBtn = overlay.querySelector('#pe-refresh');
-  const enhanceBtn = overlay.querySelector('#pe-enhance');
-  const improvedArea = overlay.querySelector('#pe-improved');
-  const acceptBtn = overlay.querySelector('#pe-accept');
-  const closeBtn = overlay.querySelector('#pe-close');
-  const status = overlay.querySelector('#pe-status');
-
-  function fetchPrompt() {
-    const text = getCurrentPrompt();
-    promptArea.value = text.trim();
-  }
-
-  fetchPrompt();
-
-  refreshBtn.addEventListener('click', fetchPrompt);
-
-  enhanceBtn.addEventListener('click', async () => {
-    const { getApiKey, requestPromptEnhancement } = await import(chrome.runtime.getURL('popup/common.js'));
-    const apiKey = await getApiKey();
-    if (!apiKey) {
-      status.textContent = 'API key required';
-      return;
-    }
-    enhanceBtn.disabled = true;
-    enhanceBtn.textContent = '…';
-    try {
-      const improved = await requestPromptEnhancement(promptArea.value, apiKey);
-      improvedArea.value = improved;
-      improvedArea.style.display = 'block';
-      acceptBtn.style.display = 'inline-block';
-    } catch (err) {
-      status.textContent = err.message;
-    } finally {
-      enhanceBtn.disabled = false;
-      enhanceBtn.textContent = 'Enhance with Gemini';
-    }
-  });
-
-  acceptBtn.addEventListener('click', () => {
-    const ok = setCurrentPrompt(improvedArea.value);
-    if (ok) {
-      overlay.remove();
-    } else {
-      status.textContent = 'Input field not found';
-    }
-  });
-
-  closeBtn.addEventListener('click', () => overlay.remove());
-}
-/* global chrome */
-
-function getCurrentPrompt() {
-  const field = document.querySelector(
-    '#prompt-textarea, div[role="textbox"], textarea[data-testid="prompt-textarea"]'
-  );
-  return field ? (field.value !== undefined ? field.value : field.innerText) : '';
-}
-
-function setCurrentPrompt(text) {
-  const field = document.querySelector(
-    '#prompt-textarea, div[role="textbox"], textarea[data-testid="prompt-textarea"]'
-  );
-  if (!field) return false;
-  if (field.value !== undefined) {
-    field.value = text;
-  } else {
-    field.innerText = text;
-  }
-  field.dispatchEvent(new Event('input', { bubbles: true }));
-  return true;
-}
-
-// Respond to popup requests for getting or setting the ChatGPT prompt
+// Respond to popup requests for getting or setting the prompt
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'GET_PROMPT') {
     const value = getCurrentPrompt();
@@ -466,6 +570,16 @@ function injectOverlayStyles() {
     .pe-textarea::-webkit-scrollbar-thumb:hover {
       background: #64748b;
     }
+
+    /* Platform indicator */
+    .pe-platform-indicator {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      opacity: 0.8;
+    }
   `;
   
   document.head.appendChild(style);
@@ -482,17 +596,23 @@ async function openOverlay() {
   backdrop.id = 'prompt-overlay-backdrop';
   document.body.appendChild(backdrop);
 
+  // Detect platform for display
+  const platform = detectPlatform();
+  const platformEmoji = platform === 'claude' ? '🤖' : platform === 'chatgpt' ? '🤖' : platform === 'gemini' ? '💎' : '✨';
+  const platformName = platform === 'claude' ? 'Claude' : platform === 'chatgpt' ? 'ChatGPT' : platform === 'gemini' ? 'Gemini' : 'AI';
+
   // Create overlay
   const overlay = document.createElement('div');
   overlay.id = 'prompt-overlay';
   overlay.innerHTML = `
     <div class="pe-header">
+      <div class="pe-platform-indicator">${platformEmoji}</div>
       ✨ Gemini Prompt Enhancer
       <button class="pe-close-btn" id="pe-close">×</button>
     </div>
     <div class="pe-container">
       <div class="pe-section">
-        <label class="pe-label">📝 Current Prompt</label>
+        <label class="pe-label">📝 Current Prompt (${platformName})</label>
         <textarea id="pe-prompt" class="pe-textarea" rows="4" placeholder="Your prompt will appear here..."></textarea>
         <div class="pe-button-group">
           <button id="pe-refresh" class="pe-button refresh">🔄 Refresh</button>
@@ -535,7 +655,9 @@ async function openOverlay() {
     const text = getCurrentPrompt();
     promptArea.value = text.trim();
     if (text.trim()) {
-      showStatus('✅ Prompt loaded', 'success');
+      showStatus(`✅ Prompt loaded from ${platformName}`, 'success');
+    } else {
+      showStatus(`❌ No prompt found. Make sure you're typing in ${platformName}`, 'error');
     }
   }
 
@@ -611,12 +733,12 @@ async function openOverlay() {
     
     const ok = setCurrentPrompt(enhancedPrompt);
     if (ok) {
-      showStatus('✅ Prompt replaced successfully!', 'success');
+      showStatus(`✅ Prompt replaced in ${platformName}!`, 'success');
       setTimeout(() => {
         closeOverlay();
       }, 1000);
     } else {
-      showStatus('❌ Input field not found', 'error');
+      showStatus(`❌ Could not find input field in ${platformName}`, 'error');
       acceptBtn.textContent = '✅ Accept & Replace';
       acceptBtn.disabled = false;
     }
