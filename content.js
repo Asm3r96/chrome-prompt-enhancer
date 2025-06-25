@@ -7,22 +7,28 @@ function getCurrentPrompt() {
   return field ? (field.value !== undefined ? field.value : field.innerText) : '';
 }
 
+function setCurrentPrompt(text) {
+  const field = document.querySelector(
+    '#prompt-textarea, div[role="textbox"], textarea[data-testid="prompt-textarea"]'
+  );
+  if (!field) return false;
+  if (field.value !== undefined) {
+    field.value = text;
+  } else {
+    field.innerText = text;
+  }
+  field.dispatchEvent(new Event('input', { bubbles: true }));
+  return true;
+}
+
 // Respond to popup requests for getting or setting the ChatGPT prompt
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.type === 'GET_PROMPT') {
     const value = getCurrentPrompt();
     sendResponse({ prompt: value.trim() });
   } else if (msg.type === 'SET_PROMPT') {
-    const field = document.querySelector(
-      '#prompt-textarea, div[role="textbox"], textarea[data-testid="prompt-textarea"]'
-    );
-    if (field) {
-      if (field.value !== undefined) {
-        field.value = msg.prompt;
-      } else {
-        field.innerText = msg.prompt;
-      }
-      field.dispatchEvent(new Event('input', { bubbles: true }));
+    const ok = setCurrentPrompt(msg.prompt);
+    if (ok) {
       sendResponse({ ok: true });
     } else {
       sendResponse({ ok: false, error: 'Input field not found' });
@@ -89,13 +95,12 @@ async function openOverlay() {
   });
 
   acceptBtn.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ type: 'SET_PROMPT', prompt: improvedArea.value }, res => {
-      if (res?.ok) {
-        overlay.remove();
-      } else {
-        status.textContent = res?.error || 'Unable to set prompt';
-      }
-    });
+    const ok = setCurrentPrompt(improvedArea.value);
+    if (ok) {
+      overlay.remove();
+    } else {
+      status.textContent = 'Input field not found';
+    }
   });
 
   closeBtn.addEventListener('click', () => overlay.remove());
