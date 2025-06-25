@@ -14,8 +14,11 @@ export async function requestPromptEnhancement(prompt, apiKey) {
           {
             role: 'user',
             parts: [
-              { text: 'Improve the following prompt for clarity, completeness and efficiency.' },
-              { text: prompt }
+              { 
+                text: `Take the following prompt and rewrite it to be clearer, more detailed, and better structured. Use plain text formatting only - no markdown, no asterisks, no special symbols. If you need to emphasize sections, use clear headings and organize with line breaks. Return ONLY the enhanced prompt - no explanations, no options, no additional text. Just the improved version:
+
+${prompt}` 
+              }
             ]
           }
         ]

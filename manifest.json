@@ -26,7 +26,7 @@
   },
   "commands": {
     "open_prompt_overlay": {
-      "suggested_key": { "default": "Alt+P" },
+      "suggested_key": { "default": "Alt+A" },
       "description": "Open overlay"
     }
   },
