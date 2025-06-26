@@ -68,8 +68,7 @@ ${prompt}`;
 function buildDefaultInstruction(settings) {
   const { tone, length } = settings;
   
-  let instruction = "Take the following prompt and rewrite it to be clearer, more detailed, and better structured.";
-  
+  let instruction = "Please enhance the following prompt by making it clearer and more specific, but keep the exact same perspective and voice. Don't change 'I', 'my', 'we' to 'you', 'your' - maintain who is asking for what.";  
   // Add tone instruction
   switch (tone) {
     case 'formal':
