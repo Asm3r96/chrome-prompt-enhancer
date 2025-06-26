@@ -1,6 +1,13 @@
 /* global chrome */
 document.addEventListener('DOMContentLoaded', async () => {
-  // Elements
+  // Tab elements
+  const settingsToggle = document.getElementById('settingsToggle');
+  const settingsIcon = document.getElementById('settingsIcon');
+  const backToMain = document.getElementById('backToMain');
+  const mainTab = document.getElementById('mainTab');
+  const settingsTab = document.getElementById('settingsTab');
+
+  // Existing elements
   const apiKeyInput = document.getElementById('apiKey');
   const togglePasswordBtn = document.getElementById('togglePassword');
   const eyeIcon = document.getElementById('eyeIcon');
@@ -11,13 +18,85 @@ document.addEventListener('DOMContentLoaded', async () => {
   const statusTitle = document.getElementById('statusTitle');
   const statusMessage = document.getElementById('statusMessage');
 
-  // Load saved API key
-  const { apiKey = '' } = await chrome.storage.sync.get('apiKey');
+  // Enhancement settings elements
+  const customPromptInput = document.getElementById('customPrompt');
+  const toneSelect = document.getElementById('toneSelect');
+  const lengthRadios = document.querySelectorAll('input[name="length"]');
+  const saveSettingsBtn = document.getElementById('saveSettings');
+  const resetSettingsBtn = document.getElementById('resetSettings');
+
+  // Default enhancement settings
+  const defaultSettings = {
+    customPrompt: '',
+    tone: 'neutral',
+    length: 'same'
+  };
+
+  // Current tab state
+  let currentTab = 'main';
+
+  // Load saved data
+  const { apiKey = '', enhancementSettings = defaultSettings } = await chrome.storage.sync.get(['apiKey', 'enhancementSettings']);
+  
+  // Set API key
   apiKeyInput.value = apiKey;
+  
+  // Set enhancement settings
+  customPromptInput.value = enhancementSettings.customPrompt || '';
+  toneSelect.value = enhancementSettings.tone || 'neutral';
+  
+  // Set length radio
+  const selectedLengthRadio = document.querySelector(`input[name="length"][value="${enhancementSettings.length || 'same'}"]`);
+  if (selectedLengthRadio) {
+    selectedLengthRadio.checked = true;
+  }
   
   // Initialize status based on API key
   updateStatus();
 
+  // TAB SWITCHING FUNCTIONALITY
+  function switchToTab(tabName) {
+    if (currentTab === tabName) return;
+
+    const fromTab = currentTab === 'main' ? mainTab : settingsTab;
+    const toTab = tabName === 'main' ? mainTab : settingsTab;
+
+    // Slide out current tab
+    fromTab.classList.add('sliding-out');
+    fromTab.classList.remove('active');
+
+    // Update settings button state
+    if (tabName === 'settings') {
+      settingsToggle.classList.add('active');
+      settingsIcon.textContent = '✕';
+    } else {
+      settingsToggle.classList.remove('active');
+      settingsIcon.textContent = '⚙️';
+    }
+
+    // Slide in new tab after a short delay
+    setTimeout(() => {
+      fromTab.classList.remove('sliding-out');
+      toTab.classList.add('active');
+      currentTab = tabName;
+    }, 150);
+  }
+
+  // Settings toggle button
+  settingsToggle.addEventListener('click', () => {
+    if (currentTab === 'main') {
+      switchToTab('settings');
+    } else {
+      switchToTab('main');
+    }
+  });
+
+  // Back to main button
+  backToMain.addEventListener('click', () => {
+    switchToTab('main');
+  });
+
+  // EXISTING FUNCTIONALITY
   // Password toggle functionality
   togglePasswordBtn.addEventListener('click', () => {
     const isPassword = apiKeyInput.type === 'password';
@@ -63,6 +142,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // Save enhancement settings
+  saveSettingsBtn.addEventListener('click', async () => {
+    const settings = {
+      customPrompt: customPromptInput.value.trim(),
+      tone: toneSelect.value,
+      length: document.querySelector('input[name="length"]:checked')?.value || 'same'
+    };
+
+    // Show loading state
+    saveSettingsBtn.classList.add('loading');
+    saveSettingsBtn.disabled = true;
+
+    try {
+      await chrome.storage.sync.set({ enhancementSettings: settings });
+      showStatus('success', 'Settings Saved', 'Your enhancement preferences have been saved');
+      
+      setTimeout(() => {
+        saveSettingsBtn.classList.remove('loading');
+        saveSettingsBtn.disabled = false;
+      }, 1000);
+      
+    } catch (error) {
+      showStatus('error', 'Save Failed', 'Failed to save settings. Please try again.');
+      saveSettingsBtn.classList.remove('loading');
+      saveSettingsBtn.disabled = false;
+    }
+  });
+
+  // Reset settings to default
+  resetSettingsBtn.addEventListener('click', async () => {
+    customPromptInput.value = defaultSettings.customPrompt;
+    toneSelect.value = defaultSettings.tone;
+    
+    const defaultLengthRadio = document.querySelector(`input[name="length"][value="${defaultSettings.length}"]`);
+    if (defaultLengthRadio) {
+      defaultLengthRadio.checked = true;
+    }
+
+    // Save the default settings
+    try {
+      await chrome.storage.sync.set({ enhancementSettings: defaultSettings });
+      showStatus('success', 'Settings Reset', 'Settings have been reset to default values');
+    } catch (error) {
+      showStatus('error', 'Reset Failed', 'Failed to reset settings. Please try again.');
+    }
+  });
+
   // Test API key connection
   testBtn.addEventListener('click', testConnection);
 
@@ -79,6 +205,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         chrome.storage.sync.set({ apiKey });
       }
     }, 2000);
+  });
+
+  // Auto-save enhancement settings
+  let settingsTimeout;
+  function autoSaveSettings() {
+    clearTimeout(settingsTimeout);
+    settingsTimeout = setTimeout(async () => {
+      const settings = {
+        customPrompt: customPromptInput.value.trim(),
+        tone: toneSelect.value,
+        length: document.querySelector('input[name="length"]:checked')?.value || 'same'
+      };
+      
+      try {
+        await chrome.storage.sync.set({ enhancementSettings: settings });
+        // Update main tab status when settings change
+        updateStatus();
+      } catch (error) {
+        console.log('Auto-save failed:', error);
+      }
+    }, 1500);
+  }
+
+  // Add auto-save listeners
+  customPromptInput.addEventListener('input', autoSaveSettings);
+  toneSelect.addEventListener('change', autoSaveSettings);
+  lengthRadios.forEach(radio => {
+    radio.addEventListener('change', autoSaveSettings);
   });
 
   // Test connection function
@@ -131,11 +285,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     const apiKey = apiKeyInput.value.trim();
     
     if (!apiKey) {
-      showStatus('info', 'Ready to Configure', 'Please enter your Gemini API key to get started');
+      showStatus('info', 'Ready to Configure', 'Click the gear icon to configure your API key');
     } else if (!apiKey.startsWith('AIza')) {
       showStatus('warning', 'Check API Key', 'Make sure you\'re using a valid Gemini API key');
     } else {
-      showStatus('success', 'API Key Configured', 'Press Alt+A on ChatGPT, Claude, or Gemini to start enhancing prompts');
+      // Check if settings are customized
+      const hasCustomSettings = customPromptInput.value.trim() || 
+                               toneSelect.value !== 'neutral' || 
+                               document.querySelector('input[name="length"]:checked')?.value !== 'same';
+      
+      if (hasCustomSettings) {
+        showStatus('success', 'Ready with Custom Settings', 'API configured with custom enhancement settings');
+      } else {
+        showStatus('success', 'Ready to Use', 'Press Alt+A on any AI platform to start enhancing');
+      }
     }
   }
 
@@ -170,7 +333,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
-    // Ctrl/Cmd + S to save
+    // Escape to go back to main tab
+    if (e.key === 'Escape' && currentTab === 'settings') {
+      e.preventDefault();
+      switchToTab('main');
+      return;
+    }
+
+    // Only handle other shortcuts when in settings tab
+    if (currentTab !== 'settings') return;
+
+    // Ctrl/Cmd + S to save API key
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault();
       saveBtn.click();
@@ -181,15 +354,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       testBtn.click();
     }
+
+    // Ctrl/Cmd + Shift + S to save settings
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'S') {
+      e.preventDefault();
+      saveSettingsBtn.click();
+    }
   });
 
-  // Auto-focus on API key input if empty
-  if (!apiKey) {
+  // Auto-focus on API key input if empty and in settings tab
+  if (!apiKey && currentTab === 'settings') {
     apiKeyInput.focus();
   }
 
   // Add helpful tooltips
   saveBtn.title = 'Save API key (Ctrl+S)';
   testBtn.title = 'Test API connection (Ctrl+T)';
+  saveSettingsBtn.title = 'Save enhancement settings (Ctrl+Shift+S)';
+  resetSettingsBtn.title = 'Reset settings to default';
   togglePasswordBtn.title = 'Toggle password visibility';
+  settingsToggle.title = 'Settings (Escape to close)';
+  backToMain.title = 'Back to main screen';
+
+  // Initialize with main tab
+  updateStatus();
 });

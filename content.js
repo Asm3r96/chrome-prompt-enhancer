@@ -677,7 +677,7 @@ async function openOverlay() {
     }, 1000);
   });
 
-  enhanceBtn.addEventListener('click', async () => {
+enhanceBtn.addEventListener('click', async () => {
     const prompt = promptArea.value.trim();
     
     if (!prompt) {
@@ -700,6 +700,7 @@ async function openOverlay() {
       enhanceBtn.classList.add('loading');
       enhanceBtn.textContent = '🤖 Enhancing...';
       
+      // Use the new function signature (settings are loaded automatically in common.js)
       const improved = await requestPromptEnhancement(prompt, apiKey);
       
       if (!improved) {

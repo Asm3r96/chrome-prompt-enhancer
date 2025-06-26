@@ -1,4 +1,4 @@
-/* Enhanced Popup Styles */
+/* Enhanced Popup Styles with Tabs */
 * {
   margin: 0;
   padding: 0;
@@ -11,26 +11,35 @@ body {
   color: #e2e8f0;
   width: 400px;
   min-height: 500px;
+  max-height: 600px;
   margin: 0;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Header */
+/* Fixed Header */
 .header {
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  padding: 20px;
+  padding: 16px 20px;
   border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  flex-shrink: 0;
 }
 
 .header-content {
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
 }
 
 .header-icon {
-  font-size: 24px;
+  font-size: 22px;
   line-height: 1;
+}
+
+.header-text {
+  flex: 1;
 }
 
 .header-text h1 {
@@ -44,6 +53,93 @@ body {
   font-size: 13px;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 400;
+}
+
+/* Settings Button */
+.settings-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.settings-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.settings-btn:active {
+  transform: scale(0.95);
+}
+
+.settings-btn.active {
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Tab Container */
+.tab-container {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.tab-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.3s ease;
+  overflow-y: auto;
+  pointer-events: none;
+}
+
+.tab-content.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.tab-content.sliding-out {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+/* Tab Header (for settings tab) */
+.tab-header {
+  padding: 16px 20px 0;
+}
+
+.back-btn {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.back-btn:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
 }
 
 /* Container */
@@ -80,6 +176,10 @@ body {
 /* Form Elements */
 .form-group {
   margin-bottom: 16px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
 }
 
 label {
@@ -151,6 +251,115 @@ input::placeholder {
 .input-help a:hover {
   color: #93c5fd;
   text-decoration: underline;
+}
+
+/* Custom Textarea */
+.custom-textarea {
+  width: 100%;
+  background: #334155;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 12px;
+  color: #e2e8f0;
+  font-size: 14px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+}
+
+.custom-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #3f4a5c;
+}
+
+.custom-textarea::placeholder {
+  color: #64748b;
+}
+
+/* Form Select */
+.form-select {
+  width: 100%;
+  background: #334155;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 12px;
+  color: #e2e8f0;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #3f4a5c;
+}
+
+.form-select option {
+  background: #334155;
+  color: #e2e8f0;
+  padding: 8px;
+}
+
+/* Radio Group */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0;
+}
+
+.radio-option:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.radio-option input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"]:checked + .radio-label {
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.radio-label {
+  font-size: 13px;
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
 }
 
 /* Buttons */
@@ -248,30 +457,32 @@ input::placeholder {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  padding: 12px;
+  padding: 14px;
   background: rgba(59, 130, 246, 0.1);
   border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 8px;
+  border-radius: 10px;
   transition: all 0.2s ease;
 }
 
 .usage-step:hover {
   background: rgba(59, 130, 246, 0.15);
   border-color: rgba(59, 130, 246, 0.3);
+  transform: translateY(-1px);
 }
 
 .step-number {
   background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
 .step-content {
@@ -279,10 +490,10 @@ input::placeholder {
 }
 
 .step-title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: #e2e8f0;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .step-description {
@@ -297,7 +508,7 @@ input::placeholder {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 10px;
   transition: all 0.3s ease;
   background: rgba(59, 130, 246, 0.1);
   border: 1px solid rgba(59, 130, 246, 0.2);
@@ -340,15 +551,56 @@ input::placeholder {
   line-height: 1.4;
 }
 
-/* Footer */
+/* Platforms Grid */
+.platforms-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.platform-card {
+  background: rgba(59, 130, 246, 0.05);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  padding: 12px 8px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.platform-card:hover {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.2);
+  transform: translateY(-2px);
+}
+
+.platform-icon {
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.platform-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 2px;
+}
+
+.platform-status {
+  font-size: 10px;
+  color: #22c55e;
+  font-weight: 500;
+}
+
+/* Fixed Footer */
 .footer {
   background: #1e293b;
-  padding: 16px 20px;
+  padding: 12px 20px;
   border-top: 1px solid #334155;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .footer-links {
@@ -373,6 +625,42 @@ input::placeholder {
   font-weight: 500;
 }
 
+/* Scrollbar styling */
+.tab-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.tab-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.tab-content::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.tab-content::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.custom-textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-textarea::-webkit-scrollbar-track {
+  background: #1e293b;
+  border-radius: 3px;
+}
+
+.custom-textarea::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 3px;
+}
+
+.custom-textarea::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
 /* Animations */
 @keyframes fadeInUp {
   from {
@@ -391,6 +679,7 @@ input::placeholder {
 
 .section:nth-child(2) { animation-delay: 0.1s; }
 .section:nth-child(3) { animation-delay: 0.2s; }
+.section:nth-child(4) { animation-delay: 0.3s; }
 
 /* Responsive */
 @media (max-width: 420px) {
@@ -404,5 +693,9 @@ input::placeholder {
   
   .btn {
     flex: none;
+  }
+  
+  .platforms-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }

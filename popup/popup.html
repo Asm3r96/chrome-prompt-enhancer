@@ -2,105 +2,229 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Gemini Prompt Enhancer Settings</title>
+    <title>Gemini Prompt Enhancer</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
+    <!-- Fixed Header -->
     <div class="header">
       <div class="header-content">
         <div class="header-icon">✨</div>
         <div class="header-text">
           <h1>Prompt Enhancer</h1>
-          <p>Settings & Configuration</p>
+          <p>Enhance AI prompts with Gemini</p>
         </div>
+        <button id="settingsToggle" class="settings-btn" title="Settings">
+          <span id="settingsIcon">⚙️</span>
+        </button>
       </div>
     </div>
 
-    <div class="container">
-      <!-- API Configuration Section -->
-      <div class="section">
-        <div class="section-header">
-          <h2>🔑 API Configuration</h2>
-          <div class="section-description">Configure your Gemini API settings</div>
+    <!-- Tab Container -->
+    <div class="tab-container">
+      
+      <!-- MAIN TAB (Default) -->
+      <div class="tab-content active" id="mainTab">
+        <div class="container">
+          
+          <!-- Quick Start Section -->
+          <div class="section">
+            <div class="section-header">
+              <h2>🚀 Quick Start</h2>
+              <div class="section-description">How to use the extension</div>
+            </div>
+            
+            <div class="usage-steps">
+              <div class="usage-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                  <div class="step-title">Open ChatGPT, Claude, or Gemini</div>
+                  <div class="step-description">Navigate to any supported AI platform and start typing your prompt</div>
+                </div>
+              </div>
+              
+              <div class="usage-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                  <div class="step-title">Press Alt+A</div>
+                  <div class="step-description">Use the keyboard shortcut to open the enhancer overlay</div>
+                </div>
+              </div>
+              
+              <div class="usage-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                  <div class="step-title">Enhance & Replace</div>
+                  <div class="step-description">Click "Enhance with Gemini" then "Accept" to replace your prompt</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Status Section -->
+          <div class="section">
+            <div class="section-header">
+              <h2>📊 Status</h2>
+              <div class="section-description">Current configuration status</div>
+            </div>
+            
+            <div class="status-card" id="statusCard">
+              <div class="status-icon" id="statusIcon">ℹ️</div>
+              <div class="status-content">
+                <div class="status-title" id="statusTitle">Ready to configure</div>
+                <div class="status-message" id="statusMessage">Click the gear icon to configure your API key</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Supported Platforms -->
+          <div class="section">
+            <div class="section-header">
+              <h2>🌐 Supported Platforms</h2>
+              <div class="section-description">Compatible AI platforms</div>
+            </div>
+            
+            <div class="platforms-grid">
+              <div class="platform-card">
+                <div class="platform-icon">🤖</div>
+                <div class="platform-name">ChatGPT</div>
+                <div class="platform-status">✅ Ready</div>
+              </div>
+              <div class="platform-card">
+                <div class="platform-icon">🤖</div>
+                <div class="platform-name">Claude.ai</div>
+                <div class="platform-status">✅ Ready</div>
+              </div>
+              <div class="platform-card">
+                <div class="platform-icon">💎</div>
+                <div class="platform-name">Gemini</div>
+                <div class="platform-status">✅ Ready</div>
+              </div>
+            </div>
+          </div>
+
         </div>
-        
-        <div class="form-group">
-          <label for="apiKey">Gemini API Key</label>
-          <div class="input-wrapper">
-            <input type="password" id="apiKey" placeholder="Enter your Gemini API key (AIza...)" />
-            <button type="button" id="togglePassword" class="input-addon">
-              <span id="eyeIcon">👁️</span>
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div class="tab-content" id="settingsTab">
+        <div class="container">
+          
+          <!-- Back Button -->
+          <div class="tab-header">
+            <button id="backToMain" class="back-btn">
+              <span>←</span> Back to Quick Start
             </button>
           </div>
-          <div class="input-help">
-            Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>
-          </div>
-        </div>
 
-        <div class="button-group">
-          <button id="save" class="btn btn-primary">
-            <span class="btn-icon">💾</span>
-            Save API Key
-          </button>
-          <button id="testKey" class="btn btn-secondary">
-            <span class="btn-icon">🧪</span>
-            Test Connection
-          </button>
+          <!-- API Configuration Section -->
+          <div class="section">
+            <div class="section-header">
+              <h2>🔑 API Configuration</h2>
+              <div class="section-description">Configure your Gemini API settings</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="apiKey">Gemini API Key</label>
+              <div class="input-wrapper">
+                <input type="password" id="apiKey" placeholder="Enter your Gemini API key (AIza...)" />
+                <button type="button" id="togglePassword" class="input-addon">
+                  <span id="eyeIcon">👁️</span>
+                </button>
+              </div>
+              <div class="input-help">
+                Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button id="save" class="btn btn-primary">
+                <span class="btn-icon">💾</span>
+                Save API Key
+              </button>
+              <button id="testKey" class="btn btn-secondary">
+                <span class="btn-icon">🧪</span>
+                Test Connection
+              </button>
+            </div>
+          </div>
+
+          <!-- Enhancement Settings Section -->
+          <div class="section">
+            <div class="section-header">
+              <h2>⚙️ Enhancement Settings</h2>
+              <div class="section-description">Customize how prompts are enhanced</div>
+            </div>
+
+            <!-- Custom Enhancement Prompt -->
+            <div class="form-group">
+              <label for="customPrompt">Custom Enhancement Instructions</label>
+              <textarea id="customPrompt" class="custom-textarea" rows="3" placeholder="Enter custom instructions for how to enhance prompts..."></textarea>
+              <div class="input-help">
+                Leave empty to use default enhancement. Use placeholders: {tone}, {length}
+              </div>
+            </div>
+
+            <!-- Tone Control -->
+            <div class="form-group">
+              <label for="toneSelect">Default Tone</label>
+              <select id="toneSelect" class="form-select">
+                <option value="neutral">Neutral</option>
+                <option value="formal">Formal</option>
+                <option value="casual">Casual</option>
+                <option value="technical">Technical</option>
+                <option value="creative">Creative</option>
+                <option value="persuasive">Persuasive</option>
+              </select>
+            </div>
+
+            <!-- Length Control -->
+            <div class="form-group">
+              <label for="lengthControl">Default Length</label>
+              <div class="radio-group">
+                <label class="radio-option">
+                  <input type="radio" name="length" value="shorter" />
+                  <span class="radio-label">📝 Shorter</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="length" value="same" checked />
+                  <span class="radio-label">📄 Same Length</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="length" value="longer" />
+                  <span class="radio-label">📚 Longer</span>
+                </label>
+                <label class="radio-option">
+                  <input type="radio" name="length" value="detailed" />
+                  <span class="radio-label">📖 More Detailed</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="button-group">
+              <button id="saveSettings" class="btn btn-primary">
+                <span class="btn-icon">💾</span>
+                Save Settings
+              </button>
+              <button id="resetSettings" class="btn btn-secondary">
+                <span class="btn-icon">🔄</span>
+                Reset to Default
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- Usage Section -->
-      <div class="section">
-        <div class="section-header">
-          <h2>🚀 Quick Start</h2>
-          <div class="section-description">How to use the extension</div>
-        </div>
-        
-        <div class="usage-steps">
-          <div class="usage-step">
-            <div class="step-number">1</div>
-            <div class="step-content">
-              <div class="step-title">Open ChatGPT, Claude, or Gemini</div>
-              <div class="step-description">Navigate to ChatGPT, Claude.ai, or Gemini and start typing your prompt</div>
-            </div>
-          </div>
-          
-          <div class="usage-step">
-            <div class="step-number">2</div>
-            <div class="step-content">
-              <div class="step-title">Press Alt+A</div>
-              <div class="step-description">Use the keyboard shortcut to open the enhancer overlay</div>
-            </div>
-          </div>
-          
-          <div class="usage-step">
-            <div class="step-number">3</div>
-            <div class="step-content">
-              <div class="step-title">Enhance & Replace</div>
-              <div class="step-description">Click "Enhance with Gemini" then "Accept" to replace your prompt</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Status Section -->
-      <div class="section">
-        <div class="status-card" id="statusCard">
-          <div class="status-icon" id="statusIcon">ℹ️</div>
-          <div class="status-content">
-            <div class="status-title" id="statusTitle">Ready to configure</div>
-            <div class="status-message" id="statusMessage">Please enter your Gemini API key to get started</div>
-          </div>
-        </div>
-      </div>
     </div>
 
+    <!-- Fixed Footer -->
     <div class="footer">
       <div class="footer-links">
-        <a href="https://github.com/yourusername/gemini-prompt-enhancer" target="_blank">📚 Documentation</a>
-        <a href="https://github.com/yourusername/gemini-prompt-enhancer/issues" target="_blank">🐛 Report Bug</a>
+        <a href="https://github.com/Asm3r96/chrome-prompt-enhancer" target="_blank">📚 Docs</a>
+        <a href="https://github.com/Asm3r96/chrome-prompt-enhancer/issues" target="_blank">🐛 Issues</a>
       </div>
-      <div class="footer-version">v0.2.0</div>
+      <div class="footer-version">v0.3.0</div>
     </div>
 
     <script type="module" src="popup.js"></script>
