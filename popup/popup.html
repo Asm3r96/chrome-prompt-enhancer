@@ -12,9 +12,9 @@
         <div class="header-icon">✨</div>
         <div class="header-text">
           <h1>Prompt Enhancer</h1>
-          <p>Enhance AI prompts with Gemini</p>
+          <p>Enhance AI prompts with LLMs</p>
         </div>
-        <button id="settingsToggle" class="settings-btn" title="Settings">
+        <button id="settingsToggle" class="settings-btn" title="Settings" style="display: none;">
           <span id="settingsIcon">⚙️</span>
         </button>
       </div>
@@ -22,6 +22,11 @@
 
     <!-- Tab Container -->
     <div class="tab-container">
+      <div class="tab-buttons">
+        <button class="tab-button active" data-tab="mainTab">🚀 Quick Start</button>
+        <button class="tab-button" data-tab="historyTab">📚 History</button>
+        <button class="tab-button" data-tab="settingsTab">⚙️ Settings</button>
+      </div>
       
       <!-- MAIN TAB (Default) -->
       <div class="tab-content active" id="mainTab">
@@ -106,6 +111,35 @@
         </div>
       </div>
 
+      <!-- HISTORY TAB -->
+      <div class="tab-content" id="historyTab">
+        <div class="container">
+          <div class="tab-header">
+            <button id="backToMainFromHistory" class="back-btn">
+              <span>←</span> Back to Quick Start
+            </button>
+          </div>
+
+          <div class="section">
+            <div class="section-header">
+              <h2>📚 Enhancement History</h2>
+              <div class="section-description">Browse and search your past prompt enhancements</div>
+            </div>
+
+            <div class="form-group">
+              <input type="text" id="historySearch" placeholder="Search prompts..." class="text-input" />
+            </div>
+
+            <div id="enhancementsList" class="enhancements-list">
+              <!-- Enhancements will be loaded here by JavaScript -->
+              <div class="no-enhancements-message" id="noEnhancementsMessage">
+                No enhancements yet. Enhance a prompt to see it here!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- SETTINGS TAB -->
       <div class="tab-content" id="settingsTab">
         <div class="container">
@@ -117,32 +151,73 @@
             </button>
           </div>
 
+          <!-- API Selection Section -->
+          <div class="section">
+            <div class="section-header">
+              <h2>🔌 API Selection</h2>
+              <div class="section-description">Choose your preferred AI model provider</div>
+            </div>
+            <div class="form-group">
+              <label for="apiProviderSelect">Choose your preferred AI model provider</label>
+              <select id="apiProviderSelect" class="form-select">
+                <option value="gemini">💎 Google Gemini</option>
+                <option value="openai">🤖 OpenAI</option>
+                <option value="claude"> Anthropic Claude</option>
+              </select>
+            </div>
+          </div>
+
           <!-- API Configuration Section -->
           <div class="section">
             <div class="section-header">
               <h2>🔑 API Configuration</h2>
-              <div class="section-description">Configure your Gemini API settings</div>
+              <div class="section-description">Configure API keys for selected providers</div>
             </div>
             
-            <div class="form-group">
-              <label for="apiKey">Gemini API Key</label>
+            <div class="form-group" id="apiModelGroup" style="display: none;">
+              <label for="apiModelSelect">Model</label>
+              <select id="apiModelSelect" class="form-select"></select>
+            </div>
+
+            <div id="geminiApiKeyGroup" class="form-group api-key-group">
+              <label for="geminiApiKey">Gemini API Key</label>
               <div class="input-wrapper">
-                <input type="password" id="apiKey" placeholder="Enter your Gemini API key (AIza...)" />
-                <button type="button" id="togglePassword" class="input-addon">
-                  <span id="eyeIcon">👁️</span>
-                </button>
+                <input type="password" id="geminiApiKey" placeholder="Enter your Gemini API key (AIza...)" />
               </div>
               <div class="input-help">
                 Get your API key from <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio</a>
               </div>
+              <div class="input-help" style="color: #22c55e;">Your API key is saved only locally in your browser. We do not see it.</div>
+            </div>
+
+            <div id="openaiApiKeyGroup" class="form-group api-key-group" style="display: none;">
+              <label for="openaiApiKey">OpenAI API Key</label>
+              <div class="input-wrapper">
+                <input type="password" id="openaiApiKey" placeholder="Enter your OpenAI API key (sk-...)" />
+              </div>
+              <div class="input-help">
+                Get your API key from <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>
+              </div>
+              <div class="input-help" style="color: #22c55e;">Your API key is saved only locally in your browser. We do not see it.</div>
+            </div>
+
+            <div id="claudeApiKeyGroup" class="form-group api-key-group" style="display: none;">
+              <label for="claudeApiKey">Anthropic Claude API Key</label>
+              <div class="input-wrapper">
+                <input type="password" id="claudeApiKey" placeholder="Enter your Anthropic Claude API key (sk-ant-...)" />
+              </div>
+              <div class="input-help">
+                Get your API key from <a href="https://console.anthropic.com/settings/keys" target="_blank">Anthropic Console</a>
+              </div>
+              <div class="input-help" style="color: #22c55e;">Your API key is saved only locally in your browser. We do not see it.</div>
             </div>
 
             <div class="button-group">
-              <button id="save" class="btn btn-primary">
+              <button id="saveApiKeys" class="btn btn-primary">
                 <span class="btn-icon">💾</span>
-                Save API Key
+                Save API Keys
               </button>
-              <button id="testKey" class="btn btn-secondary">
+              <button id="testConnection" class="btn btn-secondary">
                 <span class="btn-icon">🧪</span>
                 Test Connection
               </button>
@@ -180,25 +255,13 @@
 
             <!-- Length Control -->
             <div class="form-group">
-              <label for="lengthControl">Default Length</label>
-              <div class="radio-group">
-                <label class="radio-option">
-                  <input type="radio" name="length" value="shorter" />
-                  <span class="radio-label">📝 Shorter</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="length" value="same" checked />
-                  <span class="radio-label">📄 Same Length</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="length" value="longer" />
-                  <span class="radio-label">📚 Longer</span>
-                </label>
-                <label class="radio-option">
-                  <input type="radio" name="length" value="detailed" />
-                  <span class="radio-label">📖 More Detailed</span>
-                </label>
-              </div>
+              <label for="lengthSelect">Default Length</label>
+              <select id="lengthSelect" class="form-select">
+                <option value="shorter">📝 Shorter</option>
+                <option value="same">📄 Same Length</option>
+                <option value="longer">📚 Longer</option>
+                <option value="detailed">📖 More Detailed</option>
+              </select>
             </div>
 
             <div class="button-group">

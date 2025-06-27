@@ -677,7 +677,7 @@ async function openOverlay() {
     }, 1000);
   });
 
-enhanceBtn.addEventListener('click', async () => {
+  enhanceBtn.addEventListener('click', async () => {
     const prompt = promptArea.value.trim();
     
     if (!prompt) {
@@ -687,29 +687,39 @@ enhanceBtn.addEventListener('click', async () => {
     }
 
     try {
-      const { getApiKey, requestPromptEnhancement } = await import(chrome.runtime.getURL('popup/common.js'));
-      const apiKey = await getApiKey();
-      
-      if (!apiKey) {
-        showStatus('❌ API key required. Please set it in the extension popup.', 'error');
-        return;
-      }
-
       // Show loading state
       enhanceBtn.disabled = true;
       enhanceBtn.classList.add('loading');
       enhanceBtn.textContent = '🤖 Enhancing...';
       
-      // Use the new function signature (settings are loaded automatically in common.js)
-      const improved = await requestPromptEnhancement(prompt, apiKey);
-      
-      if (!improved) {
-        throw new Error('No enhanced prompt received');
-      }
+      // Get enhancement settings from storage
+      const { enhancementSettings } = await chrome.storage.sync.get(['enhancementSettings']);
 
-      improvedArea.value = improved;
-      enhancedSection.classList.add('show');
-      showStatus('✨ Prompt enhanced successfully!', 'success');
+      // Request enhancement from background script
+      const response = await chrome.runtime.sendMessage({ type: 'ENHANCE_PROMPT', prompt: prompt, enhancementSettings: enhancementSettings });
+
+      if (response.success) {
+        improvedArea.value = response.enhancedPrompt;
+        enhancedSection.classList.add('show');
+        showStatus('✨ Prompt enhanced successfully!', 'success');
+
+        // Save the enhancement to history
+        const { selectedApiProvider, selectedApiModel, enhancementSettings } = await chrome.storage.sync.get(['selectedApiProvider', 'selectedApiModel', 'enhancementSettings']);
+        chrome.runtime.sendMessage({
+          type: 'SAVE_ENHANCEMENT',
+          data: {
+            originalPrompt: prompt,
+            enhancedPrompt: response.enhancedPrompt,
+            apiProvider: selectedApiProvider,
+            apiModel: selectedApiModel,
+            enhancementSettings: enhancementSettings,
+            timestamp: Date.now()
+          }
+        });
+
+      } else {
+        throw new Error(response.error || 'Unknown enhancement error');
+      }
       
     } catch (err) {
       showStatus(`❌ ${err.message}`, 'error');
@@ -717,7 +727,7 @@ enhanceBtn.addEventListener('click', async () => {
     } finally {
       enhanceBtn.disabled = false;
       enhanceBtn.classList.remove('loading');
-      enhanceBtn.textContent = '🚀 Enhance with Gemini';
+      enhanceBtn.textContent = '🚀 Enhance Prompt';
     }
   });
 
