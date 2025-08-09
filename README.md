@@ -17,7 +17,9 @@ Gemini Prompt Enhancer is a Chrome extension that refines your prompts with **Ge
 - Choose **Enhance with Gemini** and then **Accept** to replace the prompt.
 
 ## Building for Release
-To publish on the Chrome Web Store:
+The Chrome Web Store listing is maintained by the project owner. Please **do not upload this extension to the store under your own account**.
+
+If you're preparing an official release:
 1. Update the version in `manifest.json`.
 2. Zip the extension directory excluding the `.git` folder:
    ```bash
