@@ -1,30 +1,41 @@
-### 1. Load unpacked
-1. Clone/download this folder.
-2. In Chrome → `chrome://extensions`, enable *Developer mode* → *Load unpacked* → select the `chrome-prompt-enhancer` folder.
-3. The wrench‑icon should appear in the toolbar.
+# Gemini Prompt Enhancer
 
-### 2. Configure
-* Click the extension icon to open the settings popup.
-* Enter your Gemini API key and click **Save**.
+Gemini Prompt Enhancer is a Chrome extension that refines your prompts with **Gemini 2.5 Flash** before sending them to ChatGPT, Claude.ai, or Gemini. It detects which platform you're using and injects an overlay so you can polish your text with a single shortcut.
 
-### 3. Use it
-* Open **ChatGPT**, **Claude.ai**, or **Gemini** and type your prompt.
-* Press **Alt+A** (or your chosen shortcut) to open the overlay on the page.
-* Click **Enhance with Gemini** and then **Accept** to replace the prompt.
+## Installation
+1. Clone or download this repository.
+2. In Chrome, open `chrome://extensions`, enable **Developer mode**, and choose **Load unpacked**.
+3. Select the `chrome-prompt-enhancer` folder. A wrench icon should appear in your toolbar.
 
-### 4. Supported Platforms
-✅ **ChatGPT** (chat.openai.com, chatgpt.com)  
-✅ **Claude.ai** (claude.ai)  
-✅ **Gemini** (gemini.google.com)  
+## Configuration
+1. Click the extension icon to open the settings popup.
+2. Enter your API key for the provider you want to use and click **Save**.
 
-The extension automatically detects which platform you're using and adapts accordingly.
+## Usage
+- Navigate to ChatGPT, Claude.ai, or Gemini and type your prompt.
+- Press **Alt+A** (or your configured shortcut) to open the overlay.
+- Choose **Enhance with Gemini** and then **Accept** to replace the prompt.
 
-### 5. Troubleshooting
-* If you get "API key required" check the popup settings.
-* If the prompt is not detected, try clicking **Refresh** in the overlay.
-* Reload the page if the extension doesn't work properly.
-* On Claude.ai, make sure you're typing in the main input area.
-* On Gemini, ensure you're typing in the main prompt box.
+## Building for Release
+To publish on the Chrome Web Store:
+1. Update the version in `manifest.json`.
+2. Zip the extension directory excluding the `.git` folder:
+   ```bash
+   zip -r chrome-prompt-enhancer.zip . -x "*.git*" "node_modules/*"
+   ```
+3. Upload the ZIP in the Chrome Web Store dashboard along with screenshots and this repository's privacy policy.
 
-### 6. Security note
-Your API key is stored locally using `chrome.storage.sync` and is only sent directly to Google's Gemini API over HTTPS. No data is shared with third parties.
+## Contributing
+Contributions are welcome! To submit a patch:
+1. Fork this repository and create a branch.
+2. Make your changes with clear, concise commits.
+3. Ensure the extension works on all supported platforms.
+4. Open a pull request explaining your changes.
+
+By participating, you agree that your contributions will be licensed under the terms of the [MIT License](LICENSE).
+
+## Privacy
+This project does not collect personal data. API keys are stored locally via Chrome Sync and are sent only to the selected model provider over HTTPS. See [PRIVACY.md](PRIVACY.md) for full details.
+
+## License
+Released under the [MIT License](LICENSE).
