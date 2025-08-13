@@ -1,30 +1,111 @@
-### 1. Load unpacked
-1. Clone/download this folder.
-2. In Chrome → `chrome://extensions`, enable *Developer mode* → *Load unpacked* → select the `chrome-prompt-enhancer` folder.
-3. The wrench‑icon should appear in the toolbar.
+# PromptUp
 
-### 2. Configure
-* Click the extension icon to open the settings popup.
-* Enter your Gemini API key and click **Save**.
+Enhance your prompts using multiple AI providers (Gemini, OpenAI, Claude) directly on ChatGPT, Claude.ai, and Gemini platforms.
 
-### 3. Use it
-* Open **ChatGPT**, **Claude.ai**, or **Gemini** and type your prompt.
-* Press **Alt+A** (or your chosen shortcut) to open the overlay on the page.
-* Click **Enhance with Gemini** and then **Accept** to replace the prompt.
+## 🚀 Installation
 
-### 4. Supported Platforms
-✅ **ChatGPT** (chat.openai.com, chatgpt.com)  
-✅ **Claude.ai** (claude.ai)  
-✅ **Gemini** (gemini.google.com)  
+### From Chrome Web Store (Recommended)
 
-The extension automatically detects which platform you're using and adapts accordingly.
+[**Add to Chrome**](# "Chrome Web Store link - to be added")
 
-### 5. Troubleshooting
-* If you get "API key required" check the popup settings.
-* If the prompt is not detected, try clicking **Refresh** in the overlay.
-* Reload the page if the extension doesn't work properly.
-* On Claude.ai, make sure you're typing in the main input area.
-* On Gemini, ensure you're typing in the main prompt box.
+Click the link above to install PromptUp directly from the Chrome Web Store.
 
-### 6. Security note
-Your API key is stored locally using `chrome.storage.sync` and is only sent directly to Google's Gemini API over HTTPS. No data is shared with third parties.
+### Quick Setup
+
+1. **Install** the extension from Chrome Web Store
+2. **Configure** your API keys by clicking the extension icon
+3. **Use** by pressing **Alt+A** on any supported platform
+
+## ✨ How to Use
+
+1. **Open any supported platform**
+   - ChatGPT (chat.openai.com, chatgpt.com)
+   - Claude.ai (claude.ai)
+   - Gemini (gemini.google.com)
+
+2. **Type your prompt** in the input field
+
+3. **Press Alt+A** to open PromptUp overlay
+
+4. **Click "Enhance Prompt"** and then **"Accept"** to replace your prompt
+
+## 🔧 Configuration
+
+1. Click the PromptUp extension icon in your toolbar
+2. Select your preferred AI provider (Gemini, OpenAI, or Claude)
+3. Enter your API key for the selected provider
+4. Customize enhancement settings (tone, length, custom instructions)
+5. Click **Save**
+
+## 🎯 Features
+
+- **Multi-AI Support**: Works with Gemini, OpenAI, and Claude APIs
+- **Cross-Platform**: Integrates with ChatGPT, Claude.ai, and Gemini
+- **Customizable**: Adjust tone, length, and add custom enhancement instructions
+- **Keyboard Shortcut**: Quick access with Alt+A
+- **History**: Track your enhanced prompts
+- **Secure**: API keys stored locally, sent only to respective providers
+
+## 🛠 Troubleshooting
+
+- **"API key required"** - Check your API key in extension settings
+- **Prompt not detected** - Click "Refresh" in the overlay
+- **Extension not working** - Reload the page
+- **Platform-specific issues**:
+  - **Claude.ai**: Make sure you're typing in the main input area
+  - **Gemini**: Ensure you're typing in the main prompt box
+
+## 🔒 Privacy & Security
+
+Your API keys are stored locally using Chrome's sync storage and are only sent directly to the respective AI providers over HTTPS. No data is shared with third parties or stored on external servers.
+
+---
+
+## 👩‍💻 For Developers
+
+### Local Development
+
+If you want to run PromptUp from source code:
+
+#### Prerequisites
+
+- Chrome browser
+- API keys from your preferred AI provider(s)
+
+#### Installation
+
+1. **Clone or download** this repository
+2. **Open Chrome** → go to `chrome://extensions`
+3. **Enable Developer mode** (toggle in top right)
+4. **Click "Load unpacked"** → select the `chrome-prompt-enhancer` folder
+5. **Configure** your API keys through the extension popup
+
+#### Development
+
+- **Reload extension**: Click reload button in `chrome://extensions` after code changes
+- **Debug content script**: Use browser DevTools on target pages
+- **Debug background script**: Click "Inspect views: service worker"
+- **Debug popup**: Right-click extension icon → Inspect popup
+
+#### Architecture
+
+- **Manifest V3** service worker extension
+- **Content scripts** for ChatGPT, Claude.ai, Gemini integration
+- **Background script** for AI API calls
+- **Popup interface** for settings and history
+
+### Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test on all supported platforms
+5. Submit a pull request
+
+### License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📞 Support
+
+Having issues? Please report them on our [GitHub Issues page](https://github.com/asm3r96/chrome-prompt-enhancer/issues).
