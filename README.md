@@ -6,7 +6,7 @@ Enhance your prompts using multiple AI providers (Gemini, OpenAI, Claude) direct
 
 ### From Chrome Web Store (Recommended)
 
-[**Add to Chrome**](# "Chrome Web Store link - to be added")
+[**Soon**](# "#")
 
 Click the link above to install PromptUp directly from the Chrome Web Store.
 
