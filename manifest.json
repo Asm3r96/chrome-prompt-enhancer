@@ -1,7 +1,7 @@
 {
-  "name": "Gemini Prompt Enhancer",
-  "description": "Use Gemini 2.5 Flash to refine prompts in ChatGPT, Claude.ai, and Gemini.",
-  "version": "0.4.0",
+  "name": "PromptUp",
+  "description": "Enhance your prompts using multiple AI providers on ChatGPT, Claude.ai, and Gemini platforms.",
+  "version": "1.0.0",
   "manifest_version": 3,
   "background": {
     "service_worker": "background.js"
@@ -26,20 +26,14 @@
   ],
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "Prompt Enhancer"
+    "default_title": "PromptUp"
   },
   "commands": {
     "open_prompt_overlay": {
       "suggested_key": { "default": "Alt+A" },
-      "description": "Open prompt enhancer overlay"
+      "description": "Open PromptUp overlay"
     }
   },
-  "web_accessible_resources": [
-    {
-      "resources": ["popup/common.js"],
-      "matches": ["<all_urls>"]
-    }
-  ],
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",

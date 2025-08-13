@@ -1,15 +1,39 @@
-# Node modules and dependencies
-node_modules/
+CLAUDE.md
+.claude/
 
-# Logs and diagnostic reports
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Development files
+*.log
+*.tmp
 
-# OS generated files
+# System files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Packed extension
-chrome-prompt-enhancer.zip
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
+# Node modules (if you add build tools later)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Temporary files
+*.zip
+*.tar.gz
+dist/
+build/
+
+# API keys and sensitive data
+.env
+.env.local
+config.json
+secrets.json
