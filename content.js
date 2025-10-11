@@ -11,7 +11,7 @@ function detectPlatform() {
 
 function getCurrentPrompt() {
   const platform = detectPlatform();
-  
+
   if (platform === 'chatgpt') {
     const selectors = [
       '#prompt-textarea',
@@ -19,7 +19,7 @@ function getCurrentPrompt() {
       'textarea[data-testid="prompt-textarea"]',
       'textarea[placeholder*="message"]'
     ];
-    
+
     for (const selector of selectors) {
       const field = document.querySelector(selector);
       if (field) {
@@ -36,22 +36,22 @@ function getCurrentPrompt() {
     // Claude uses ProseMirror editor
     const proseMirror = document.querySelector('.ProseMirror');
     if (proseMirror) {
-      // Get text from the paragraph inside ProseMirror
-      const paragraph = proseMirror.querySelector('p');
-      if (paragraph) {
-        return paragraph.textContent || paragraph.innerText || '';
+      // Get text from all paragraphs inside ProseMirror
+      const paragraphs = proseMirror.querySelectorAll('p');
+      if (paragraphs && paragraphs.length > 0) {
+        return Array.from(paragraphs).map(p => p.textContent || p.innerText).join('\n');
       }
       // Fallback to ProseMirror itself
       return proseMirror.textContent || proseMirror.innerText || '';
     }
-    
+
     // Fallback selectors for Claude
     const fallbackSelectors = [
       'div[contenteditable="true"]',
       'div[aria-label*="prompt"]',
       'div[aria-label*="Claude"]'
     ];
-    
+
     for (const selector of fallbackSelectors) {
       const field = document.querySelector(selector);
       if (field) {
@@ -62,22 +62,22 @@ function getCurrentPrompt() {
     // Gemini uses Quill editor
     const quillEditor = document.querySelector('.ql-editor');
     if (quillEditor) {
-      // Get text from the paragraph inside Quill editor
-      const paragraph = quillEditor.querySelector('p');
-      if (paragraph) {
-        return paragraph.textContent || paragraph.innerText || '';
+      // Get text from all paragraphs inside Quill editor
+      const paragraphs = quillEditor.querySelectorAll('p');
+      if (paragraphs && paragraphs.length > 0) {
+        return Array.from(paragraphs).map(p => p.textContent || p.innerText).join('\n');
       }
       // Fallback to Quill editor itself
       return quillEditor.textContent || quillEditor.innerText || '';
     }
-    
+
     // Fallback selectors for Gemini
     const fallbackSelectors = [
       'div[aria-label*="Enter a prompt"]',
       'div[data-placeholder*="Gemini"]',
       'div[contenteditable="true"]'
     ];
-    
+
     for (const selector of fallbackSelectors) {
       const field = document.querySelector(selector);
       if (field) {
@@ -85,7 +85,7 @@ function getCurrentPrompt() {
       }
     }
   }
-  
+
   return '';
 }
 
@@ -115,7 +115,12 @@ function getSelectedText() {
 
 function setCurrentPrompt(text) {
   const platform = detectPlatform();
-  
+
+  // Helper to create paragraphs from text with newlines
+  const createParagraphs = (text) => {
+    return text.split('\n').map(line => `<p>${line || '<br>'}</p>`).join('');
+  };
+
   if (platform === 'chatgpt') {
     const selectors = [
       '#prompt-textarea',
@@ -123,7 +128,7 @@ function setCurrentPrompt(text) {
       'textarea[data-testid="prompt-textarea"]',
       'textarea[placeholder*="message"]'
     ];
-    
+
     for (const selector of selectors) {
       const field = document.querySelector(selector);
       if (field) {
@@ -134,12 +139,12 @@ function setCurrentPrompt(text) {
             field.innerText = text;
             field.textContent = text;
           }
-          
+
           // Trigger events for ChatGPT
           field.dispatchEvent(new Event('input', { bubbles: true }));
           field.dispatchEvent(new Event('change', { bubbles: true }));
           field.focus();
-          
+
           return true;
         } catch (error) {
           console.log('Error setting prompt with selector:', selector, error);
@@ -148,22 +153,22 @@ function setCurrentPrompt(text) {
       }
     }
   } else if (platform === 'claude') {
+    const html = createParagraphs(text);
     // Claude uses ProseMirror editor
     const proseMirror = document.querySelector('.ProseMirror');
     if (proseMirror) {
       try {
-        // Set the content as a paragraph (matching Claude's structure)
-        proseMirror.innerHTML = `<p>${text}</p>`;
-        
+        proseMirror.innerHTML = html;
+
         // Trigger events to notify Claude of the change
         proseMirror.dispatchEvent(new Event('input', { bubbles: true }));
         proseMirror.dispatchEvent(new Event('change', { bubbles: true }));
         proseMirror.dispatchEvent(new Event('keyup', { bubbles: true }));
         proseMirror.dispatchEvent(new Event('paste', { bubbles: true }));
-        
+
         // Focus the editor
         proseMirror.focus();
-        
+
         // Move cursor to end
         const range = document.createRange();
         const selection = window.getSelection();
@@ -171,25 +176,25 @@ function setCurrentPrompt(text) {
         range.collapse(false);
         selection.removeAllRanges();
         selection.addRange(range);
-        
+
         return true;
       } catch (error) {
         console.log('Error setting Claude prompt:', error);
       }
     }
-    
+
     // Fallback for other contenteditable elements
     const fallbackSelectors = [
       'div[contenteditable="true"]',
       'div[aria-label*="prompt"]',
       'div[aria-label*="Claude"]'
     ];
-    
+
     for (const selector of fallbackSelectors) {
       const field = document.querySelector(selector);
       if (field) {
         try {
-          field.innerHTML = `<p>${text}</p>`;
+          field.innerHTML = html;
           field.dispatchEvent(new Event('input', { bubbles: true }));
           field.focus();
           return true;
@@ -200,22 +205,22 @@ function setCurrentPrompt(text) {
       }
     }
   } else if (platform === 'gemini') {
+    const html = createParagraphs(text);
     // Gemini uses Quill editor
     const quillEditor = document.querySelector('.ql-editor');
     if (quillEditor) {
       try {
-        // Set the content as a paragraph (matching Gemini's structure)
-        quillEditor.innerHTML = `<p>${text}</p>`;
-        
+        quillEditor.innerHTML = html;
+
         // Trigger events to notify Gemini of the change
         quillEditor.dispatchEvent(new Event('input', { bubbles: true }));
         quillEditor.dispatchEvent(new Event('change', { bubbles: true }));
         quillEditor.dispatchEvent(new Event('keyup', { bubbles: true }));
         quillEditor.dispatchEvent(new Event('paste', { bubbles: true }));
-        
+
         // Focus the editor
         quillEditor.focus();
-        
+
         // Move cursor to end
         const range = document.createRange();
         const selection = window.getSelection();
@@ -223,25 +228,25 @@ function setCurrentPrompt(text) {
         range.collapse(false);
         selection.removeAllRanges();
         selection.addRange(range);
-        
+
         return true;
       } catch (error) {
         console.log('Error setting Gemini prompt:', error);
       }
     }
-    
+
     // Fallback for other contenteditable elements
     const fallbackSelectors = [
       'div[aria-label*="Enter a prompt"]',
       'div[data-placeholder*="Gemini"]',
       'div[contenteditable="true"]'
     ];
-    
+
     for (const selector of fallbackSelectors) {
       const field = document.querySelector(selector);
       if (field) {
         try {
-          field.innerHTML = `<p>${text}</p>`;
+          field.innerHTML = html;
           field.dispatchEvent(new Event('input', { bubbles: true }));
           field.focus();
           return true;
@@ -252,7 +257,7 @@ function setCurrentPrompt(text) {
       }
     }
   }
-  
+
   return false;
 }
 
@@ -640,7 +645,7 @@ async function openOverlay() {
   overlay.innerHTML = `
     <div class="pe-header">
       <div class="pe-platform-indicator">${platformEmoji}</div>
-      ✨ Gemini Prompt Enhancer
+      ✨ PromptUp
       <button class="pe-close-btn" id="pe-close">×</button>
     </div>
     <div class="pe-container">
@@ -649,7 +654,7 @@ async function openOverlay() {
         <textarea id="pe-prompt" class="pe-textarea" rows="4" placeholder="Your prompt will appear here..."></textarea>
         <div class="pe-button-group">
           <button id="pe-refresh" class="pe-button refresh">🔄 Refresh</button>
-          <button id="pe-enhance" class="pe-button enhance">🚀 Enhance with Gemini</button>
+          <button id="pe-enhance" class="pe-button enhance">🚀 Enhance Prompt</button>
         </div>
       </div>
       
@@ -735,28 +740,39 @@ async function openOverlay() {
     }
 
     try {
-      const { getApiKey, requestPromptEnhancement } = await import(chrome.runtime.getURL('popup/common.js'));
-      const apiKey = await getApiKey();
-      
-      if (!apiKey) {
-        showStatus('❌ API key required. Please set it in the extension popup.', 'error');
-        return;
-      }
-
       // Show loading state
       enhanceBtn.disabled = true;
       enhanceBtn.classList.add('loading');
       enhanceBtn.textContent = '🤖 Enhancing...';
       
-      const improved = await requestPromptEnhancement(prompt, apiKey);
-      
-      if (!improved) {
-        throw new Error('No enhanced prompt received');
-      }
+      // Get enhancement settings from storage with defaults
+      const { enhancementSettings = { customPrompt: '', tone: 'neutral', length: 'same' } } = await chrome.storage.sync.get(['enhancementSettings']);
 
-      improvedArea.value = improved;
-      enhancedSection.classList.add('show');
-      showStatus('✨ Prompt enhanced successfully!', 'success');
+      // Request enhancement from background script
+      const response = await chrome.runtime.sendMessage({ type: 'ENHANCE_PROMPT', prompt: prompt, enhancementSettings: enhancementSettings });
+
+      if (response.success) {
+        improvedArea.value = response.enhancedPrompt;
+        enhancedSection.classList.add('show');
+        showStatus('✨ Prompt enhanced successfully!', 'success');
+
+        // Save the enhancement to history
+        const { selectedApiProvider, selectedApiModel, enhancementSettings = { customPrompt: '', tone: 'neutral', length: 'same' } } = await chrome.storage.sync.get(['selectedApiProvider', 'selectedApiModel', 'enhancementSettings']);
+        chrome.runtime.sendMessage({
+          type: 'SAVE_ENHANCEMENT',
+          data: {
+            originalPrompt: prompt,
+            enhancedPrompt: response.enhancedPrompt,
+            apiProvider: selectedApiProvider,
+            apiModel: selectedApiModel,
+            enhancementSettings: enhancementSettings,
+            timestamp: Date.now()
+          }
+        });
+
+      } else {
+        throw new Error(response.error || 'Unknown enhancement error');
+      }
       
     } catch (err) {
       showStatus(`❌ ${err.message}`, 'error');
@@ -764,7 +780,7 @@ async function openOverlay() {
     } finally {
       enhanceBtn.disabled = false;
       enhanceBtn.classList.remove('loading');
-      enhanceBtn.textContent = '🚀 Enhance with Gemini';
+      enhanceBtn.textContent = '🚀 Enhance Prompt';
     }
   });
 
