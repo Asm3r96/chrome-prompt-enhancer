@@ -89,6 +89,30 @@ function getCurrentPrompt() {
   return '';
 }
 
+// Get currently selected text on the page (supports selections inside inputs/textareas)
+function getSelectedText() {
+  try {
+    const sel = window.getSelection && window.getSelection();
+    if (sel && sel.toString && sel.toString().trim()) {
+      return sel.toString();
+    }
+  } catch (_) {}
+
+  const active = document.activeElement;
+  if (
+    active &&
+    (active.tagName === 'TEXTAREA' ||
+      (active.tagName === 'INPUT' && (active.type === 'text' || active.type === 'search' || active.type === 'email' || active.type === 'url' || active.type === 'tel')))
+  ) {
+    const start = active.selectionStart;
+    const end = active.selectionEnd;
+    if (typeof start === 'number' && typeof end === 'number' && end > start) {
+      return active.value.substring(start, end);
+    }
+  }
+  return '';
+}
+
 function setCurrentPrompt(text) {
   const platform = detectPlatform();
   
@@ -596,10 +620,19 @@ async function openOverlay() {
   backdrop.id = 'prompt-overlay-backdrop';
   document.body.appendChild(backdrop);
 
-  // Detect platform for display
+  // Detect platform for display and selection hint
   const platform = detectPlatform();
-  const platformEmoji = platform === 'claude' ? '🤖' : platform === 'chatgpt' ? '🤖' : platform === 'gemini' ? '💎' : '✨';
-  const platformName = platform === 'claude' ? 'Claude' : platform === 'chatgpt' ? 'ChatGPT' : platform === 'gemini' ? 'Gemini' : 'AI';
+  const initialSelection = (getSelectedText() || '').trim();
+  const platformEmoji = initialSelection ? '✂️' : platform === 'claude' ? '🤖' : platform === 'chatgpt' ? '🤖' : platform === 'gemini' ? '💎' : '✨';
+  const platformName = initialSelection
+    ? 'Selection'
+    : platform === 'claude'
+    ? 'Claude'
+    : platform === 'chatgpt'
+    ? 'ChatGPT'
+    : platform === 'gemini'
+    ? 'Gemini'
+    : 'AI';
 
   // Create overlay
   const overlay = document.createElement('div');
@@ -612,7 +645,7 @@ async function openOverlay() {
     </div>
     <div class="pe-container">
       <div class="pe-section">
-        <label class="pe-label">📝 Current Prompt (${platformName})</label>
+        <label class="pe-label">📝 Current Text (${platformName})</label>
         <textarea id="pe-prompt" class="pe-textarea" rows="4" placeholder="Your prompt will appear here..."></textarea>
         <div class="pe-button-group">
           <button id="pe-refresh" class="pe-button refresh">🔄 Refresh</button>
@@ -652,17 +685,32 @@ async function openOverlay() {
   }
 
   function fetchPrompt() {
-    const text = getCurrentPrompt();
-    promptArea.value = text.trim();
-    if (text.trim()) {
+    // Prioritize selected text if available
+    const selected = (getSelectedText() || '').trim();
+    if (selected) {
+      promptArea.value = selected;
+      showStatus('✅ Selected text loaded', 'success');
+      return;
+    }
+
+    // Fallback to platform-specific prompt detection
+    const text = (getCurrentPrompt() || '').trim();
+    promptArea.value = text;
+    if (text) {
       showStatus(`✅ Prompt loaded from ${platformName}`, 'success');
     } else {
-      showStatus(`❌ No prompt found. Make sure you're typing in ${platformName}`, 'error');
+      showStatus(`❌ No text found. Type or select content to enhance.`, 'error');
     }
   }
 
   // Load initial prompt
-  fetchPrompt();
+  if (initialSelection) {
+    promptArea.value = initialSelection;
+    status.className = 'pe-status show success';
+    status.textContent = '✅ Selected text loaded';
+  } else {
+    fetchPrompt();
+  }
 
   // Event listeners
   refreshBtn.addEventListener('click', () => {
@@ -720,7 +768,7 @@ async function openOverlay() {
     }
   });
 
-  acceptBtn.addEventListener('click', () => {
+  acceptBtn.addEventListener('click', async () => {
     const enhancedPrompt = improvedArea.value.trim();
     
     if (!enhancedPrompt) {
@@ -736,9 +784,19 @@ async function openOverlay() {
       showStatus(`✅ Prompt replaced in ${platformName}!`, 'success');
       setTimeout(() => {
         closeOverlay();
-      }, 1000);
-    } else {
-      showStatus(`❌ Could not find input field in ${platformName}`, 'error');
+      }, 800);
+      return;
+    }
+
+    // Fallback: copy to clipboard so user can paste anywhere
+    try {
+      await navigator.clipboard.writeText(enhancedPrompt);
+      showStatus('📋 Copied to clipboard. Paste where needed.', 'success');
+      setTimeout(() => {
+        closeOverlay();
+      }, 800);
+    } catch (e) {
+      showStatus('❌ Could not insert or copy text.', 'error');
       acceptBtn.textContent = '✅ Accept & Replace';
       acceptBtn.disabled = false;
     }
